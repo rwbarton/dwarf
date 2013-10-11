@@ -116,12 +116,13 @@ getSLEB128 =
         byte <- liftM fromIntegral getWord8 :: Get Word64
         temp <- return $ acc .|. (clearBit byte 7 `shiftL` shift)
         if testBit byte 7 then
-            go temp (shift + 7)
+            go temp shift'
          else
-            if shift < 32  && testBit byte 6 then
-                return $ fromIntegral $ temp .|. ((-1) `shiftL` shift)
+            if testBit byte 6 then
+                return $ fromIntegral $ temp .|. ((-1) `shiftL` shift')
              else
                 return $ fromIntegral temp
+          where shift' = shift + 7
     in go 0 0
 
 -- Decode an unsigned little-endian base 128 encoded integer.
